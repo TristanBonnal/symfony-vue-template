@@ -83,3 +83,51 @@ Encore
 ```bash
 npm run dev-server
 ```
+
+### 5) Ajouter tailwindcss :
+[Voir documentation, mais attention, dernière version non compatible avec sass](https://tailwindcss.com/docs/installation/framework-guides/symfony)
+```bash
+# si non compatible avec sass, forcer la version de tailwind à ^3.4.7 
+npm install tailwindcss autoprefixer postcss postcss-loader
+```
+Ajouter la directive : 
+```js
+// webpack.config.js
+Encore
+    .enablePostCssLoader()
+;
+```
+Import : 
+```css
+/* assets/styles/app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Configurer tailwind :
+```js
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    content: [
+        "./assets/**/*.js",
+        "./assets/**/*.vue",
+        "./templates/**/*.html.twig",
+    ],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+}
+```
+
+Config postcss :
+```js
+module.exports = {
+    plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
+    },
+};
+```
