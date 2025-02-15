@@ -1,6 +1,5 @@
 <script setup>
 import {ref} from "vue";
-import {logPlugin} from "@babel/preset-env/lib/debug";
     let tasks = ref([]);
     let text = ref('');
     let completedAreHidden = ref(false);
@@ -18,11 +17,11 @@ import {logPlugin} from "@babel/preset-env/lib/debug";
 
         tasks.value.push(newTask)
         text.value = "";
+        sortTasks();
     }
 
-    const handleCheck = function(task) {
-        // todo: sort tasks by completed
-        // tasks.value.sort((a, b) => (b.completed - a.completed));
+    const sortTasks = function() {
+        tasks.value.sort((a, b) => a.completed - b.completed);
     }
 
 </script>
@@ -31,14 +30,19 @@ import {logPlugin} from "@babel/preset-env/lib/debug";
     <div class="container mx-auto w-2/3 py-5">
         <form action="" @submit.prevent="handleSubmit">
             <input class="border mb-3 mr-2" v-model="text" type="text" name="task" id="task">
-            <button class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600" type="submit">Ajouter</button>
+            <button
+                class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                :disabled="text.length === 0"
+                type="submit">
+                    Ajouter
+            </button>
         </form>
 
         <p v-if="tasks.length === 0">Aucune tâche à afficher</p>
 
         <ul v-else>
             <li v-for="task in tasks" :key="task.title" :class="{'line-through': task.completed, hidden: task.completed && completedAreHidden }">
-                <input type="checkbox" v-model="task.completed" @input="handleCheck(task)">
+                <input type="checkbox" v-model="task.completed" @change="sortTasks">    <!-- Ici @change fonctionne mieux que @input, car le @input se déclenche avant que task.completed soit à jour -->
                 {{ task.title }}
             </li>
         </ul>
