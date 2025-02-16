@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
     let tasks = ref([]);
     let text = ref('');
     let completedAreHidden = ref(false);
@@ -24,6 +24,9 @@ import {ref} from "vue";
         tasks.value.sort((a, b) => a.completed - b.completed);
     }
 
+    let notCompletedTasksCount = computed(() => tasks.value.filter(task => !task.completed).length);
+
+
 </script>
 
 <template>
@@ -42,8 +45,10 @@ import {ref} from "vue";
 
         <ul v-else>
             <li v-for="task in tasks" :key="task.title" :class="{'line-through': task.completed, hidden: task.completed && completedAreHidden }">
-                <input type="checkbox" v-model="task.completed" @change="sortTasks">    <!-- Ici @change fonctionne mieux que @input, car le @input se déclenche avant que task.completed soit à jour -->
-                {{ task.title }}
+                <label>
+                    <input type="checkbox" v-model="task.completed" @change="sortTasks">
+                    {{ task.title }}
+                </label>
             </li>
         </ul>
 
@@ -53,5 +58,7 @@ import {ref} from "vue";
         >
             {{ completedAreHidden ? 'Afficher' : 'Masquer' }} les tâches complétées
         </button>
+
+        <p>Il reste {{ notCompletedTasksCount }} tâches à faire</p>
     </div>
 </template>
