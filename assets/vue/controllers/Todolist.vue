@@ -1,5 +1,8 @@
 <script setup>
 import {computed, ref} from "vue";
+import Button from "./Button.vue";
+import Task from "./Task.vue";
+
     let tasks = ref([]);
     let text = ref('');
     let completedAreHidden = ref(false);
@@ -26,38 +29,26 @@ import {computed, ref} from "vue";
 
     let notCompletedTasksCount = computed(() => tasks.value.filter(task => !task.completed).length);
 
-
 </script>
 
 <template>
     <div class="container mx-auto w-2/3 py-5">
         <form action="" @submit.prevent="handleSubmit">
             <input class="border mb-3 mr-2" v-model="text" type="text" name="task" id="task">
-            <button
-                class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                :disabled="text.length === 0"
-                type="submit">
-                    Ajouter
-            </button>
+            <Button text="Ajouter" :disabled="text.length === 0" type="submit" />   <!-- text est une prop, alors que disabled et type sont des attributs passés implicitement à l'élément de premier niveau du composant Button -->
         </form>
 
         <p v-if="tasks.length === 0">Aucune tâche à afficher</p>
 
         <ul v-else>
-            <li v-for="task in tasks" :key="task.title" :class="{'line-through': task.completed, hidden: task.completed && completedAreHidden }">
-                <label>
-                    <input type="checkbox" v-model="task.completed" @change="sortTasks">
-                    {{ task.title }}
-                </label>
-            </li>
+            <Task v-bind="{ tasks, completedAreHidden }" @sortTasks="sortTasks" />
+            <!-- v-bind="{ tasks, completedAreHidden }" est équivalent à :tasks="tasks" :completedAreHidden="completedAreHidden" -->
         </ul>
 
-        <button
-            @click="completedAreHidden = !completedAreHidden"
-            class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-            {{ completedAreHidden ? 'Afficher' : 'Masquer' }} les tâches complétées
-        </button>
+        <Button
+            :text="(completedAreHidden ? 'Afficher' : 'Masquer') + 'les tâches complétées'"
+            @hide-completed="completedAreHidden = !completedAreHidden"
+        ></Button>
 
         <p>Il reste {{ notCompletedTasksCount }} tâches à faire</p>
     </div>
