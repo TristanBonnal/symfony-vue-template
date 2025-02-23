@@ -3,8 +3,5 @@
 {% block title %}Todolist{% endblock %}
 
 {% block body %}
-
-
-
-<div {{ vue_component('Todolist', { 'name': 'tristan'}) }}></div>
+    <div {{ vue_component('Todolist', { 'taskList': tasks}) }}></div>
 {% endblock %}

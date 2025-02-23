@@ -1,11 +1,16 @@
 <script setup>
-import {computed, ref} from "vue";
-import Button from "./Button.vue";
-import Task from "./Task.vue";
+    import {computed, ref} from "vue";
+    import Button from "./Button.vue";
+    import Task from "./Task.vue";
 
-    let tasks = ref([]);
+    const props = defineProps({
+        taskList: Array,
+    })
+
+    let tasks = ref(JSON.parse(props.taskList));
     let text = ref('');
     let completedAreHidden = ref(false);
+
     const handleSubmit = function() {
         const today = new Date();
 
@@ -23,11 +28,16 @@ import Task from "./Task.vue";
         sortTasks();
     }
 
+    const updateCompleted = function() {
+        sortTasks();
+    }
+
     const sortTasks = function() {
         tasks.value.sort((a, b) => a.completed - b.completed);
     }
 
     let notCompletedTasksCount = computed(() => tasks.value.filter(task => !task.completed).length);
+    sortTasks();
 
 </script>
 
@@ -41,8 +51,10 @@ import Task from "./Task.vue";
         <p v-if="tasks.length === 0">Aucune tâche à afficher</p>
 
         <ul v-else>
-            <Task v-bind="{ tasks, completedAreHidden }" @sortTasks="sortTasks" />
-            <!-- v-bind="{ tasks, completedAreHidden }" est équivalent à :tasks="tasks" :completedAreHidden="completedAreHidden" -->
+            <li v-for="task in tasks" :key="task.id" :class="{'line-through': task.completed, hidden: task.completed && completedAreHidden }">
+                <Task v-bind="{ task }" @updateCompleted="updateCompleted" />
+                <!-- v-bind="{ tasks }" est équivalent à :task="task"" -->
+            </li>
         </ul>
 
         <Button
