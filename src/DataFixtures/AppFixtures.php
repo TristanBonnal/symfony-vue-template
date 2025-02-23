@@ -21,7 +21,7 @@ class AppFixtures extends Fixture
         foreach ($titles as $title) {
             $task = new Task();
             $task->setTitle($title);
-            $task->setIsCompleted(false);
+            $task->setCompleted(false);
             $task->setCreatedAt(new \DateTime());
 
             $manager->persist($task);

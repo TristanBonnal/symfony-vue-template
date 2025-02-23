@@ -20,10 +20,15 @@ class Task
     private ?string $title = null;
 
     #[ORM\Column]
-    private ?bool $isCompleted = null;
+    private ?bool $completed = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeInterface $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -44,12 +49,12 @@ class Task
 
     public function isCompleted(): ?bool
     {
-        return $this->isCompleted;
+        return $this->completed;
     }
 
-    public function setIsCompleted(bool $isCompleted): static
+    public function setCompleted(bool $completed): static
     {
-        $this->isCompleted = $isCompleted;
+        $this->completed = $completed;
 
         return $this;
     }

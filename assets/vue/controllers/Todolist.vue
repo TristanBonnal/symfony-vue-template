@@ -2,6 +2,7 @@
     import {computed, ref} from "vue";
     import Button from "./Button.vue";
     import Task from "./Task.vue";
+    import axios from 'axios';
 
     const props = defineProps({
         taskList: Array,
@@ -11,17 +12,15 @@
     let text = ref('');
     let completedAreHidden = ref(false);
 
-    const handleSubmit = function() {
-        const today = new Date();
-
+    const handleSubmit = async function() {
         const newTask = {
             title: text.value,
             completed: false,
-            date:
-                String(today.getDate()).padStart(2, '0') +
-                String(today.getMonth() + 1).padStart(2, '0') +
-                today.getFullYear()
         }
+
+        const createdTask = await createTask(newTask);
+        newTask.id = createdTask.id;
+
 
         tasks.value.push(newTask)
         text.value = "";
@@ -34,6 +33,15 @@
 
     const sortTasks = function() {
         tasks.value.sort((a, b) => a.completed - b.completed);
+    }
+
+    async function createTask(newTask) {
+        try {
+            const response = await axios.post('/api/tasks', newTask);
+            return response.data;
+        } catch (error) {
+            console.error('Erreur lors de l’envoi de la tâche :', error);
+        }
     }
 
     let notCompletedTasksCount = computed(() => tasks.value.filter(task => !task.completed).length);
