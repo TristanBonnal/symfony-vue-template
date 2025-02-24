@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\TaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ApiResource]
@@ -17,6 +18,12 @@ class Task
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: 'Le nom de la tâche est doit contenir au moins {{ limit }} caractères',
+        maxMessage: 'Le nom de la tâche est doit contenir au maximum {{ limit }} caractères',
+    )]
     private ?string $title = null;
 
     #[ORM\Column]

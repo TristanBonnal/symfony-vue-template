@@ -11,16 +11,20 @@
     let tasks = ref(JSON.parse(props.taskList));
     let text = ref('');
     let completedAreHidden = ref(false);
+    let errorMessage = ref('');
 
     const handleSubmit = async function() {
+        errorMessage.value = '';
         const newTask = {
             title: text.value,
             completed: false,
         }
 
-        const createdTask = await createTask(newTask);
-        newTask.id = createdTask.id;
-
+        const response = await createTask(newTask);
+        if (response instanceof Error) {
+            errorMessage.value = response.response.data.description;
+            return;
+        }
 
         tasks.value.push(newTask)
         text.value = "";
@@ -38,9 +42,10 @@
     async function createTask(newTask) {
         try {
             const response = await axios.post('/api/tasks', newTask);
-            return response.data;
+            newTask.id = response.data.id;
+            return response;
         } catch (error) {
-            console.error('Erreur lors de l’envoi de la tâche :', error);
+            return error;
         }
     }
 
@@ -51,6 +56,7 @@
 
 <template>
     <div class="container mx-auto w-2/3 py-5">
+        <div class="text-white bg-red-800 w-fit py-2 px-4 rounded-md mb-2" v-if="errorMessage.length > 0">{{errorMessage}}</div>
         <form action="" @submit.prevent="handleSubmit">
             <input class="border mb-3 mr-2" v-model="text" type="text" name="task" id="task">
             <Button text="Ajouter" :disabled="text.length === 0" type="submit" />   <!-- text est une prop, alors que disabled et type sont des attributs passés implicitement à l'élément de premier niveau du composant Button -->
@@ -67,7 +73,7 @@
 
         <Button
             :text="(completedAreHidden ? 'Afficher' : 'Masquer') + 'les tâches complétées'"
-            @hide-completed="completedAreHidden = !completedAreHidden"
+            :handleClick="() => completedAreHidden = !completedAreHidden"
         ></Button>
 
         <p>Il reste {{ notCompletedTasksCount }} tâches à faire</p>
